@@ -72,8 +72,8 @@
         const currentSearch = window.location.search;
         const currentHash = window.location.hash;
         
-        // Build the redirect URL
-        const redirectUrl = '/' + currentPath + currentSearch + currentHash;
+        // Build the redirect URL (fix double slash issue)
+        const redirectUrl = currentPath + currentSearch + currentHash;
         
         // Store the attempted URL for the React app to handle
         localStorage.setItem('githubPagesRedirect', redirectUrl);

@@ -1,0 +1,26 @@
+# Netlify redirects file
+# This file handles client-side routing for Netlify deployments
+# All routes should be handled by React Router
+
+# Handle all routes by serving index.html (for React Router)
+/*    /index.html   200
+
+# API proxy (if needed for development) 
+/api/*  https://your-api-domain.com/api/:splat  200
+
+# Handle specific file types that should not be redirected
+/favicon.ico   /favicon.ico   200
+/robots.txt    /robots.txt    200
+/sitemap.xml   /sitemap.xml   200
+/*.css         /:splat        200
+/*.js          /:splat        200
+/*.png         /:splat        200
+/*.jpg         /:splat        200
+/*.jpeg        /:splat        200
+/*.gif         /:splat        200
+/*.svg         /:splat        200
+/*.ico         /:splat        200
+/*.woff        /:splat        200
+/*.woff2       /:splat        200
+/*.ttf         /:splat        200
+/*.eot         /:splat        200

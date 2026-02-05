@@ -1,7 +1,7 @@
 // Service Worker for caching static assets
-const CACHE_NAME = 'sardar-fashion-v1';
-const STATIC_CACHE = 'static-v1';
-const DYNAMIC_CACHE = 'dynamic-v1';
+const CACHE_NAME = 'sardar-fashion-v2';
+const STATIC_CACHE = 'static-v2';
+const DYNAMIC_CACHE = 'dynamic-v2';
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
@@ -13,12 +13,15 @@ const STATIC_ASSETS = [
   '/favicon.ico'
 ];
 
-// API endpoints to cache
-const API_CACHE_PATTERNS = [
-  /\/api\/categories/,
-  /\/api\/products/,
-  /\/api\/hero-images/,
-  /\/uploads\//
+// API/data paths - never cache; always fetch fresh (network-only)
+const API_NETWORK_ONLY_PATTERNS = [
+  /\/store\/\d+\/categories/,
+  /\/store\/\d+\/products/,
+  /\/store\/\d+\/product\//,
+  /\/store\/\d+\/hero-images/,
+  /\/store\/\d+\/search/,
+  /\/store\/\d+\/info/,
+  /\/store\/\d+\/settings/
 ];
 
 // Install event - cache static assets
@@ -72,41 +75,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle API requests
-  if (API_CACHE_PATTERNS.some(pattern => pattern.test(url.pathname))) {
+  // API/data requests: always fetch from network, never use cache (so new products/categories show immediately)
+  if (API_NETWORK_ONLY_PATTERNS.some(pattern => pattern.test(url.pathname))) {
     event.respondWith(
-      caches.open(DYNAMIC_CACHE)
-        .then((cache) => {
-          return cache.match(request)
-            .then((cachedResponse) => {
-              if (cachedResponse) {
-                // Return cached version and update in background
-                fetch(request)
-                  .then((networkResponse) => {
-                    if (networkResponse.ok) {
-                      cache.put(request, networkResponse.clone());
-                    }
-                  })
-                  .catch(() => {
-                    // Network failed, keep using cached version
-                  });
-                return cachedResponse;
-              }
-
-              // No cache, fetch from network
-              return fetch(request)
-                .then((networkResponse) => {
-                  if (networkResponse.ok) {
-                    cache.put(request, networkResponse.clone());
-                  }
-                  return networkResponse;
-                })
-                .catch(() => {
-                  // Return offline fallback if available
-                  return caches.match('/offline.html');
-                });
-            });
-        })
+      fetch(request).catch(() => caches.match('/offline.html'))
     );
     return;
   }
